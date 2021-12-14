@@ -1,0 +1,8 @@
+id: "base"
+base_config: 'base'
+data:
+  params:
+    dataset_path: '/home/albert/data/TSRD-Test'
+model:
+  params:
+    pretrained: false
