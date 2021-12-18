@@ -1,8 +1,13 @@
-# Traffic light recognition
+# Cat classifier
+### Introduction
+The main goal of this code is to make a model that is able to decide which of the two cats 
+(Sajt or Pali), or whether both of them are on an image. To train it I used a small dataset 
+containing either or both cats.
+
 ### Requirements
-The required packages can be found in *config/env_files/traffic_sign_recognition_env.yml*. 
+The required packages can be found in *config/env_files/cat_classifier_env.yml*. 
 Dependencies could be installed by running:
-> conda env create -f config/env_files/traffic_sign_recognition_env.yml
+> conda env create -f config/env_files/cat_classifier_env.yml
 
 ### Configuration
 The experiments are run according to configurations. The config files for those can be found in 
@@ -20,14 +25,17 @@ The code should be run with arguments:
 --id_tag specifies the name under the config where the results will be saved \
 --config specifies the config name to use (eg. config "base" for *config/config_files/base.yaml*)\
 --mode can be 'train', 'val', 'test' or 'hpo' 
+--save_preds to save the predictions during eval/test
+--visualize to make visualization of the model during eval/test
 
 ### Required data
 The required data's path should be specified inside the config file like:
 > data: \
   &emsp; params: \
-  &emsp; dataset_path: '/home/data/R-jpg' \
+  &emsp; dataset_path: 'dataset' \
 
-During train, val and hpo the files should be under their class subdirectory (eg. */home/data/R-jpg/stop_table*). \
+During train, val and hpo the files should be under their class subdirectory 
+(eg. *dataset/sajt*). \
 During test the files should all be in the specified directory.  
 
 ### Saving and loading experiment
@@ -41,6 +49,8 @@ All the experiment will be saved under the given results dir: {result_dir}/{conf
 2. train and val metric csv
 3. the best model
 4. confusion matrices and by class metrics
+5. predictions if set
+6. visualizations if set
 
 If the result dir already exists and contains a model file then the experiment will automatically resume
 (either resume the training or use the trained model for inference.)
@@ -58,9 +68,10 @@ For eval the  results dir ({result_dir}/{config_id}/{id_tag arg}) should contain
 #### Test
 For test the  results dir ({result_dir}/{config_id}/{id_tag arg}) should contain a model as 
 *model_best.pth.tar*. During test the predictions will be saved along with the filepaths in a csv file.\
-A pretrained model can be found in [here](https://drive.google.com/file/d/1sILKQ3MkCy7lSEOz8E7s3u5G5bJPpVzs/view?usp=sharing). 
-For simplicity it is recommended to copy it under *results/base/base* and just change the dataset path to yours in *config/config_files/test.yaml*.
-> python run.py --config test --mode test
+A pretrained model can be found in [here](https://drive.google.com/file/d/1zCYo_C2dIai4zTsj2YFdrvlAK_I4gJ5g/view?usp=sharing). 
+For simplicity it is recommended to copy it under *results/base/base* 
+and just change the dataset path to yours in *config/config_files/base_test.yaml*.
+> python run.py --config base_test --mode test --save_pred
 
 #### HPO
 For hpo use:
@@ -68,10 +79,21 @@ For hpo use:
 
 ### Example of the results:
 HPO result:
-![Screenshot from 2021-11-16 01-07-55](https://user-images.githubusercontent.com/36601982/141872068-600b5cea-11d9-44d2-b84a-7566fa5df99c.png)
 
 Confusion matrix:
-![confusion_matrix_val_40](https://user-images.githubusercontent.com/36601982/141871724-630f07af-82db-4c28-92f1-ca6d77bcba20.png)
+We can see from the confusion matrix, that it is really good on the train, but less good 
+on the validation set, mostly on Pali (due to having way more Pali images than images
+of other classes). This suggests overfitting. 
+
+Train:
+
+Test:
 
 By class F1 score:
-![F1_val_40](https://user-images.githubusercontent.com/36601982/141871759-d975873a-a07f-4cb0-b2d3-f566982b461f.png)
+We can see the same from the classwise F1 scores than the confusion matrix: a large 
+difference between the train and val scores, and that on the validation set we have
+way higher score for Pali.
+
+Train:
+
+Test:
