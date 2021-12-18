@@ -5,7 +5,7 @@ from data.datasets.cat_dataset import CatDataloader
 
 def get_dataloader(data_config, mode):
     # get the iterator object
-    if data_config.name == 'traffic_signs':
+    if data_config.name == 'cat_dataset':
         dataset = CatDataloader(data_config.params, mode)
     else:
         raise ValueError(f'Wrong dataset name: {data_config.name}')

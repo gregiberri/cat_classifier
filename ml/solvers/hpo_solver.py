@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 from config import ConfigNamespace
 from ml.hpo import get_hpo_algorithm
-from ml.solvers.base_solver import Solver
+from ml.solvers.ml_solver import MLSolver
 
 
 class HPOSolver(object):
@@ -43,8 +43,11 @@ class HPOSolver(object):
                           queue_trials=True, local_dir=ray_result_dir,
                           resources_per_trial={"cpu": self.config.hpo.cpu_per_trial,
                                                "gpu": self.config.hpo.gpu_per_trial},
-                          search_alg=search_alg)
+                          search_alg=search_alg,
+                          metric='_metric',
+                          mode=self.config.hpo.hpo_algorithm.params.mode)
 
+        self.report_result(result)
 
     def report_result(self, result):
         """
@@ -52,7 +55,7 @@ class HPOSolver(object):
 
         :param result: result file from the tune run
         """
-        best_trial = result.get_best_trial('accuracy', 'max', 'last')
+        best_trial = result.get_best_trial('_metric', 'max', 'last')
         print("Best trial config: {}".format(best_trial.logdir))
         print("Best trial final validation accuracy: {}".format(best_trial.last_result['_metric']))
 
@@ -82,7 +85,7 @@ class HPOSolver(object):
         config.id = os.path.join(config.id, 'hpo_outputs')
 
         with suppress_stdout():  # do not print out the Solvers` output
-            solver = Solver(config, args)
+            solver = MLSolver(config, args)
             metric = solver.run()
 
         tune.report(metric)

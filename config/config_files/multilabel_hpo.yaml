@@ -1,0 +1,27 @@
+id: "multilabel_hpo"
+base_config: 'multilabel'
+hpo:
+  num_samples: 100
+  cpu_per_trial: 6
+  gpu_per_trial: 0.3
+  hpo_algorithm:
+    name: 'SkOptSearch'
+    params:
+      mode: 'max'
+data:
+  params:
+    balanced_classes: ['choice', [['', 'true']]]
+    batch_size: ['uniform', [1, 16]]
+model:
+  params:
+    pretrained: ['choice', [['', 'true']]]
+optimizer:
+  name: ['choice', [['Adam', 'RAdam', 'Ranger']]]
+  params:
+    lr: ['loguniform', [0.00001, 0.01]]
+    weight_decay: ['loguniform', [0.000001, 0.001]]
+loss:
+#  name: ['choice', [['CrossEntropyLoss', 'FocalLoss']]]
+   name: 'FocalLoss'
+   params:
+     gamma: ['uniform', [0.5, 3]]

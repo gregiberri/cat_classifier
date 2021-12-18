@@ -1,4 +1,4 @@
-id: "base"
+id: "multilabel"
 env:
   result_dir: 'results'
   positive_threshold: 0.7
@@ -11,8 +11,10 @@ metrics:
     Precision: {num_classes: 3, average: 'macro'}
     Recall: {num_classes: 3, average: 'macro'}
     F1: {num_classes: 3, average: 'macro'}
+visualizer:
+  vizualized_images: ['GuidedBackprop', 'ScoreCam', 'OcclusionSensitivity']
 data:
-  name: "traffic_signs"
+  name: "cat_dataset"
   params:
     dataset_path: 'dataset'
 
@@ -33,7 +35,7 @@ data:
 
     multilabel_classification: True
     gpu_to_use: 0
-    workers: 4
+    workers: 8
     load_into_memory: false
     train_val_split: [0.8, 0.2]
 model:

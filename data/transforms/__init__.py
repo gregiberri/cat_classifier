@@ -16,7 +16,7 @@ def make_transform_composition(transformation_list, split):
     """
     compose_list = []
     if split == 'val' or split == 'test':
-        transformation_list = transformation_list[-3:]
+        transformation_list = transformation_list[-2:]
 
     for item in transformation_list:
         if hasattr(transforms, item[0]):

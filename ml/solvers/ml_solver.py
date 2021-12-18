@@ -1,5 +1,6 @@
 import gc
 import logging
+import os
 import sys
 import time
 import torch
@@ -9,11 +10,12 @@ from data.datasets import get_dataloader
 from ml.models import get_model
 from ml.modules.losses import get_loss
 from ml.optimizers import get_optimizer, get_lr_policy, get_lr_policy_parameter
+from ml.visualizer.visualizer import Visualizer
 from utils.device import DEVICE, put_minibatch_to_device
 from utils.iohandler import IOHandler
 
 
-class Solver(object):
+class MLSolver(object):
 
     def __init__(self, config, args):
         """
@@ -35,6 +37,9 @@ class Solver(object):
         self.init_optimizer()
         self.init_lr_policy()
         self.iohandler = IOHandler(args, self)
+        self.visualizer = Visualizer(self.model,
+                                     self.config.visualizer,
+                                     self.iohandler.result_dir)
 
     def init_epochs(self):
         """
@@ -127,9 +132,8 @@ class Solver(object):
         Evaluate the model and save the predictions to a csv file during testing inference.
         """
         self.current_mode = 'val'
-        with torch.no_grad():
-            self.run_epoch()
-            self.iohandler.save_results_csv()
+        self.run_epoch()
+        self.iohandler.save_results_csv()
 
     def before_epoch(self):
         """
@@ -186,16 +190,20 @@ class Solver(object):
         :return: output, loss
         """
         # prediction
-        output = self.model(minibatch['input_images'])
 
         if self.current_mode == 'train':
+            output = self.model(minibatch['input_images'])
             # training step
             self.optimizer.zero_grad()
             loss = self.loss(output, minibatch['labels_one_hot'])
             loss.backward()
             self.optimizer.step()
         else:
+            with torch.no_grad():
+                output = self.model(minibatch['input_images'])
             loss = 0
+            if self.args.visualize and self.phase == 'val':
+                self.visualizer.visualize(minibatch['input_images'], minibatch['paths'][0])
 
         return output, loss
 

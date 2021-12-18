@@ -151,13 +151,20 @@ class IOHandler:
         :param train_time: time spent with training
         :param loss: loss value
         """
-        print_str = f'[{self.solver.current_mode}] epoch {self.solver.epoch}/{self.solver.epochs} ' \
-                    + f'iter {idx + 1}/{len(self.solver.loader)}:' \
-                    + f'lr:{self.solver.optimizer.param_groups[0]["lr"]:.5f}|' \
-                    + f'loss: {loss:.3f}|' \
-                    + self.metric.get_snapshot_info() \
-                    + f'|t_prep: {preproc_time:.3f}s|' \
-                    + f't_train: {train_time:.3f}s'
+        if self.phase == 'train':
+            print_str = f'[{self.solver.current_mode}] epoch {self.solver.epoch}/{self.solver.epochs} ' \
+                        + f'iter {idx + 1}/{len(self.solver.loader)}:' \
+                        + f'lr:{self.solver.optimizer.param_groups[0]["lr"]:.5f}|' \
+                        + f'loss: {loss:.3f}|' \
+                        + self.metric.get_snapshot_info() \
+                        + f'|t_prep: {preproc_time:.3f}s|' \
+                        + f't_train: {train_time:.3f}s'
+        else:
+            print_str = f'[{self.solver.current_mode}] epoch {self.solver.epoch}/{self.solver.epochs} ' \
+                        + f'iter {idx + 1}/{len(self.solver.loader)}:' \
+                        + self.metric.get_snapshot_info() \
+                        + f'|t_prep: {preproc_time:.3f}s|' \
+                        + f't_train: {train_time:.3f}s'
         pbar.set_description(print_str, refresh=False)
 
     def compute_epoch_metric(self):
@@ -217,7 +224,7 @@ class IOHandler:
             self.val_metric = continue_state_object['val_metric']
 
         self.solver.epoch = continue_state_object['epoch']
-        self.solver.config = continue_state_object['config']
+        # self.solver.config = continue_state_object['config']
         self.solver.model.load_state_dict(continue_state_object['model'])
         if DEVICE == torch.device('cuda'): self.solver.model.cuda()
 
