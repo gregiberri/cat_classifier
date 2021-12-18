@@ -15,7 +15,7 @@ visualizer:
 data:
   name: "cat_dataset"
   params:
-    dataset_path: 'dataset'
+    dataset_path: 'dataset/mindket_cica'
 
     batch_size: 16
     input_size: [512, 512]

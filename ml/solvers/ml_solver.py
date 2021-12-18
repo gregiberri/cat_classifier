@@ -133,7 +133,7 @@ class MLSolver(object):
         """
         self.current_mode = 'val'
         self.run_epoch()
-        self.iohandler.save_results_csv()
+        if self.args.save_preds: self.iohandler.save_results_csv()
 
     def before_epoch(self):
         """

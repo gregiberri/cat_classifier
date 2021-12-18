@@ -8,6 +8,7 @@ from PIL import Image
 from torch.utils import data
 
 from data.transforms import make_transform_composition
+from data.utils.read_data import read_image_paths_in_folder
 from data.utils.split_train_val import split_train_val
 
 
@@ -75,7 +76,7 @@ class CatDataloader(data.Dataset):
             if self.split == 'train':
                 split_train_val(self.config.train_val_split, self.config.dataset_path)
             elif self.split == 'test':
-                return glob.glob(os.path.join(self.config.dataset_path, '*.jpg')), None
+                return read_image_paths_in_folder(self.config.dataset_path), None, self.get_class_names()
             else:
                 raise ValueError(f'Mode should be `train` for train-val split or `test` for testing on images.')
 
@@ -84,12 +85,13 @@ class CatDataloader(data.Dataset):
             data = list(reader)
         paths, labels = list(zip(*data))
 
+        return np.array(paths), np.array(labels, dtype=int), self.get_class_names()
+
+    def get_class_names(self):
         with open('classnumber_classname.csv', newline='') as f:
             reader = csv.reader(f)
             data = list(reader)
-        class_names = list(zip(*data))[-1]
-
-        return np.array(paths), np.array(labels, dtype=int), class_names
+        return list(zip(*data))[-1]
 
     def dataset_balance_class_probabilities(self):
         """
