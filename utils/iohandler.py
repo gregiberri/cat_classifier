@@ -4,7 +4,8 @@ import os
 import torch
 from tensorboardX import SummaryWriter
 
-from data.utils.multilabel_pred_to_single_label import multilabel_pred_to_single_label
+from data.utils.multilabel_pred_to_single_label import single_object_multilabel_pred_to_single_label, \
+    multilabel_pred_to_single_label
 from data.utils.split_train_val import load_csv, save_csv
 from ml.metrics.metrics import Metrics
 from utils.device import DEVICE
@@ -116,9 +117,14 @@ class IOHandler:
         """
         pred = pred.detach().cpu()
         if self.solver.val_loader.dataset.config.multilabel_classification:
-            pred = multilabel_pred_to_single_label(pred,
-                                                   self.solver.val_loader.dataset.labels_names,
-                                                   self.solver.config.env.positive_threshold)
+            if self.solver.val_loader.dataset.config.single_object_classes:
+                pred = single_object_multilabel_pred_to_single_label(pred,
+                                                                     self.solver.val_loader.dataset.labels_names,
+                                                                     self.solver.config.env.positive_threshold)
+            else:
+                pred = multilabel_pred_to_single_label(pred,
+                                                       self.solver.val_loader.dataset.labels_names,
+                                                       self.solver.config.env.positive_threshold)
 
         return pred
 

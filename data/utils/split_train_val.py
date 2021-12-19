@@ -15,7 +15,8 @@ def get_paths_and_labels(data_dir):
     :return: paths, labels
     """
     data_dict = read_paths(data_dir)
-    names_numbers = dict(zip(data_dict.keys(), list(range(len(data_dict.keys())))))
+    names_numbers = dict(zip(sorted(data_dict.keys(), reverse=True), list(range(len(data_dict.keys())))))
+    names_numbers['egyik_sem'] = max(list(names_numbers.values())) + 1
     # split the data_dict and get lists of the paths and the corresponding label numbers
     paths, labels = zip(*[[value, names_numbers[key]] for key, value_list in data_dict.items() for value in value_list])
     assert len(paths) and len(labels) and len(paths) == len(labels), \

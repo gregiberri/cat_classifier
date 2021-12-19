@@ -1,21 +1,22 @@
 id: "base"
 env:
   result_dir: 'results'
+  positive_threshold: 0.7
   random_seed: 0
   epochs: 10
 metrics:
   goal_metric: 'F1'
   save_metrics:
-    Accuracy: {num_classes: 3, average: 'macro'}
-    Precision: {num_classes: 3, average: 'macro'}
-    Recall: {num_classes: 3, average: 'macro'}
-    F1: {num_classes: 3, average: 'macro'}
+    Accuracy: {num_classes: 4, average: 'macro'}
+    Precision: {num_classes: 4, average: 'macro'}
+    Recall: {num_classes: 4, average: 'macro'}
+    F1: {num_classes: , average: 'macro'}
 visualizer:
   vizualized_images: ['GuidedBackprop', 'ScoreCam', 'OcclusionSensitivity']
 data:
   name: "cat_dataset"
   params:
-    dataset_path: 'dataset/mindket_cica'
+    dataset_path: 'dataset'
 
     batch_size: 16
     input_size: [512, 512]
@@ -32,7 +33,8 @@ data:
                  ['ToTensor', []],
                  ['Normalize', [[0.4432, 0.3938, 0.3764], [0.1560, 0.1815, 0.1727]]]]
 
-    multilabel_classification: False
+    multilabel_classification: True
+    single_object_classes: False
     gpu_to_use: 0
     workers: 8
     load_into_memory: false
@@ -43,7 +45,7 @@ model:
     num_classes: 3
     pretrained: true
 loss:
-  name: 'CrossEntropyLoss'
+  name: 'BCEWithLogitsLoss'
   params:
     weight: null
 optimizer:

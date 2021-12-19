@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from torchmetrics import ConfusionMatrix
 import pandas as pd
 
-from data.utils.multilabel_pred_to_single_label import multilabel_pred_to_single_label
+from data.utils.multilabel_pred_to_single_label import single_object_multilabel_pred_to_single_label
 from data.utils.split_train_val import load_csv
 from ml.metrics import get_metric
 import seaborn as sn

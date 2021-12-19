@@ -21,8 +21,10 @@ class CatDataloader(data.Dataset):
         self.config = config
         self.split = split
 
-        self.multilabel_name_to_one_hot = {'pali': [1., 0.], 'sajt': [0., 1.], 'mindket_cica': [1., 1.]}
-
+        self.single_object_name_to_one_hot = {'pali': [1., 0.], 'sajt': [0., 1.],
+                                              'mindket_cica': [1., 1.], 'egyik_se': [0., 0.]}
+        self.object_name_to_one_hot = {'pali': [1., 0., 0.], 'sajt': [0., 1., 0.],
+                                       'mindket_cica': [0., 0., 1.], 'egyik_se': [0., 0., 0.]}
         self.original_paths, self.original_labels, self.labels_names = self.load_labels_and_paths()
 
         # undersample the overpresented, and oversample the underpresented classes
@@ -47,7 +49,10 @@ class CatDataloader(data.Dataset):
         if self.labels is not None:
             label = int(self.labels[item])
             if self.config.multilabel_classification:
-                label_one_hot = self.multilabel_name_to_one_hot[self.labels_names[label]]
+                if self.config.single_object_classes:
+                    label_one_hot = self.single_object_name_to_one_hot[self.labels_names[label]]
+                else:
+                    label_one_hot = self.object_name_to_one_hot[self.labels_names[label]]
             else:
                 label_one_hot = (np.arange(self.config.num_classes) == label).astype(float)
             label_one_hot = torch.as_tensor(label_one_hot, dtype=torch.float)
