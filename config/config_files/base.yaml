@@ -1,16 +1,16 @@
 id: "base"
 env:
   result_dir: 'results'
-  positive_threshold: 0.7
+  positive_threshold: 0.3
   random_seed: 0
   epochs: 10
 metrics:
   goal_metric: 'F1'
   save_metrics:
-    Accuracy: {num_classes: 4, average: 'macro'}
-    Precision: {num_classes: 4, average: 'macro'}
-    Recall: {num_classes: 4, average: 'macro'}
-    F1: {num_classes: , average: 'macro'}
+    Accuracy: {num_classes: 3, average: 'macro'}
+    Precision: {num_classes: 3, average: 'macro'}
+    Recall: {num_classes: 3, average: 'macro'}
+    F1: {num_classes: 3, average: 'macro'}
 visualizer:
   vizualized_images: ['GuidedBackprop', 'ScoreCam', 'OcclusionSensitivity']
 data:
@@ -33,7 +33,7 @@ data:
                  ['ToTensor', []],
                  ['Normalize', [[0.4432, 0.3938, 0.3764], [0.1560, 0.1815, 0.1727]]]]
 
-    multilabel_classification: True
+    multilabel_classification: false
     single_object_classes: False
     gpu_to_use: 0
     workers: 8
@@ -52,7 +52,7 @@ optimizer:
   name: 'RAdam'
   params:
     lr: 0.0001
-    weight_decay: 0.001
+    weight_decay: 0.0001
 lr_policy:
   name: 'ReduceLROnPlateau'
   params:

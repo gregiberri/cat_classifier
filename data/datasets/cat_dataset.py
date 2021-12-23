@@ -21,9 +21,9 @@ class CatDataloader(data.Dataset):
         self.config = config
         self.split = split
 
-        self.single_object_name_to_one_hot = {'pali': [1., 0.], 'sajt': [0., 1.],
+        self.single_object_name_to_one_hot = {'sajt': [1., 0.], 'pali': [0., 1.],
                                               'mindket_cica': [1., 1.], 'egyik_se': [0., 0.]}
-        self.object_name_to_one_hot = {'pali': [1., 0., 0.], 'sajt': [0., 1., 0.],
+        self.object_name_to_one_hot = {'sajt': [1., 0., 0.], 'pali': [0., 1., 0.],
                                        'mindket_cica': [0., 0., 1.], 'egyik_se': [0., 0., 0.]}
         self.original_paths, self.original_labels, self.labels_names = self.load_labels_and_paths()
 
