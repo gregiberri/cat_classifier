@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from torchmetrics import ConfusionMatrix
 import pandas as pd
 
-from data.utils.multilabel_pred_to_single_label import single_object_multilabel_pred_to_single_label
+from data.utils.multilabel_pred_to_singlelabel import single_object_multilabel_pred_to_single_label
 from data.utils.split_train_val import load_csv
 from ml.metrics import get_metric
 import seaborn as sn
@@ -64,10 +64,10 @@ class Metrics(object):
 
     def compute_epoch_metric(self, epoch_pred, epoch_gt, writer, epoch):
         epoch_metric = self.compute_metric(epoch_pred, epoch_gt)
+        logging.info(f'The results of epoch {epoch} {self.tag} are: {self.get_snapshot_info()}')
         self.save_metrics(epoch_metric)
         self.epoch_results = {key: results + [epoch_metric[key]] for key, results in self.epoch_results.items()}
         self.draw_goal_metric_by_class(epoch_pred, epoch_gt, writer, epoch)
-        logging.info(f'The results of epoch {epoch} {self.tag} are: {self.get_snapshot_info()}')
 
     def draw_goal_metric_by_class(self, epoch_pred, epoch_gt, writer, epoch):
         if not os.path.exists(self.by_class_result_dir):

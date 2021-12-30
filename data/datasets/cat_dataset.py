@@ -22,9 +22,9 @@ class CatDataloader(data.Dataset):
         self.split = split
 
         self.single_object_name_to_one_hot = {'sajt': [1., 0.], 'pali': [0., 1.],
-                                              'mindket_cica': [1., 1.], 'egyik_se': [0., 0.]}
+                                              'mindket_cica': [1., 1.], 'egyik_sem': [0., 0.]}
         self.object_name_to_one_hot = {'sajt': [1., 0., 0.], 'pali': [0., 1., 0.],
-                                       'mindket_cica': [0., 0., 1.], 'egyik_se': [0., 0., 0.]}
+                                       'mindket_cica': [0., 0., 1.], 'egyik_sem': [0., 0., 0.]}
         self.original_paths, self.original_labels, self.labels_names = self.load_labels_and_paths()
 
         # undersample the overpresented, and oversample the underpresented classes
@@ -76,10 +76,11 @@ class CatDataloader(data.Dataset):
 
         :return: [paths, labels]: list of the paths and list of the corresponding labels
         """
-        split_file_path = os.path.join(self.config.dataset_path, self.split + '.csv')
+        filename = self.split + '_w_negs.csv' if self.config.include_negatives else self.split + '.csv'
+        split_file_path = os.path.join(self.config.dataset_path, filename)
         if not os.path.exists(split_file_path):
             if self.split == 'train':
-                split_train_val(self.config.train_val_split, self.config.dataset_path)
+                split_train_val(self.config.train_val_split, self.config.dataset_path, self.config.include_negatives)
             elif self.split == 'test':
                 return read_image_paths_in_folder(self.config.dataset_path), None, self.get_class_names()
             else:
@@ -105,7 +106,17 @@ class CatDataloader(data.Dataset):
         """
         class_numbers = list(Counter(self.original_labels).keys())
         class_sizes = list(Counter(self.original_labels).values())
-        class_sizes_mean = np.mean(class_sizes)
+        # use only the object classes for calculating the class size mean
+        try:
+            egyik_sem_index = self.labels_names.index('egyik_sem')
+            egyik_sem_class_index = class_numbers.index(egyik_sem_index)
+            class_sizes_mean = np.mean(class_sizes[:egyik_sem_class_index]+class_sizes[egyik_sem_class_index+1:])
+        except ValueError:  # if there is no `egyik_sem` in class_numbers, then we have to add 0 instead of it
+            class_sizes_mean = np.mean(class_sizes)
+            # complete class numbers and class_sizes with new numbers and zeros for empty classes
+            if len(self.labels_names) > len(class_numbers):
+                class_numbers = class_numbers + list(range(len(self.labels_names)))[len(class_numbers):]
+                class_sizes = class_sizes + [0] * (len(class_numbers) - len(class_sizes))
 
         return {int(class_number): int(min(class_sizes_mean, class_size * 10))
                 for class_number, class_size in zip(class_numbers, class_sizes)}

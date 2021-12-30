@@ -108,6 +108,7 @@ class MLSolver(object):
         else:
             raise ValueError(f'Wrong phase: {self.phase}. It should be `train`, `val` or `test`.')
 
+        logging.info(f'Max result: {self.iohandler.get_max_metric()}')
         return self.iohandler.get_max_metric()
 
     def train(self):
